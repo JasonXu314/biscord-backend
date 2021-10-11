@@ -13,6 +13,9 @@ export class AppController implements OnGatewayConnection, OnGatewayDisconnect {
 		this.logger = new Logger('Main');
 	}
 
+	@Post('/wakeup')
+	public wakeup(): void {}
+
 	@Post('/login')
 	@UsePipes(new ValidationPipe({ whitelist: true }))
 	public login(@Body() { name, avatar }: LoginDTO): LoginResponse {
