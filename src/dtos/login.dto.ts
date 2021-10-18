@@ -1,4 +1,4 @@
-import { IsString, MaxLength, MinLength } from 'class-validator';
+import { IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
 
 export class LoginDTO {
 	@IsString()
@@ -7,5 +7,6 @@ export class LoginDTO {
 	name!: string;
 
 	@IsString()
-	avatar!: string;
+	@IsOptional()
+	avatar?: string;
 }

@@ -9,7 +9,7 @@ config();
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule);
 
-	app.enableCors({ origin: [/localhost:3000$/, /biscord.vercel.app$/] });
+	app.enableCors({ origin: [/localhost:3000$/, /biscord-two\.vercel\.app$/] });
 	app.useWebSocketAdapter(new WsAdapter(app));
 
 	await app.listen(process.env.PORT || 5000);

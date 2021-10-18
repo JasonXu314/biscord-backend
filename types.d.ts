@@ -10,7 +10,7 @@ type User = {
 type Message = {
 	rawContent: string;
 	id: string;
-	author: User;
+	author: string;
 };
 
 type LoginResponse = {

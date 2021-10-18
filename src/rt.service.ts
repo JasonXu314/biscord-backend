@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { nanoid } from 'nanoid';
 import WebSocket from 'ws';
+import { randomColor } from './utils/utils';
 
 @Injectable()
 export class RTService {
@@ -27,14 +28,14 @@ export class RTService {
 		this.names.add('God');
 	}
 
-	public registerUser(name: string, avatar: string): User {
+	public registerUser(name: string, avatar: string | undefined): User {
 		if (this.names.has(name)) {
 			throw new BadRequestException({ type: 'failure', reason: 'That name is already taken!' });
 		}
 
 		const newUser: User = {
 			name,
-			avatar,
+			avatar: avatar || `${process.env.BACKEND_URL}/${randomColor()}.png`,
 			id: nanoid()
 		};
 
@@ -76,7 +77,7 @@ export class RTService {
 				if (thisSocket !== socket) {
 					thisSocket.send(JSON.stringify({ type: 'USER_JOIN', user: thisUser } as OutboundSocketMsg));
 				}
-				const joinMsg = { author: this.GOD, id: nanoid(), rawContent: `${thisUser.name} has joined the chat` };
+				const joinMsg = { author: '', id: nanoid(), rawContent: `${thisUser.name} has joined the chat` };
 				this.messages.push(joinMsg);
 				thisSocket.send(
 					JSON.stringify({
@@ -91,7 +92,7 @@ export class RTService {
 
 				switch (msg.type) {
 					case 'MESSAGE': {
-						const message = { id: nanoid(), rawContent: msg.message, author: thisUser };
+						const message = { id: nanoid(), rawContent: msg.message, author: thisUser.id };
 						this.messages.push(message);
 						this.idsToSockets.forEach((socket) => {
 							socket.send(JSON.stringify({ type: 'MESSAGE', message } as OutboundSocketMsg));
@@ -130,7 +131,7 @@ export class RTService {
 
 			this.idsToSockets.forEach((socket) => {
 				socket.send(JSON.stringify({ type: 'USER_LEAVE', id: user.id } as OutboundSocketMsg));
-				const leaveMsg = { author: this.GOD, id: nanoid(), rawContent: `${user.name} has left the chat` };
+				const leaveMsg = { author: '', id: nanoid(), rawContent: `${user.name} has left the chat` };
 				socket.send(
 					JSON.stringify({
 						type: 'MESSAGE',
@@ -138,6 +139,10 @@ export class RTService {
 					} as OutboundSocketMsg)
 				);
 			});
+
+			if (this.users.size === 1) {
+				this.messages.splice(0);
+			}
 		}
 	}
 
