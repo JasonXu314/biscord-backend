@@ -132,6 +132,7 @@ export class RTService {
 			this.idsToSockets.forEach((socket) => {
 				socket.send(JSON.stringify({ type: 'USER_LEAVE', id: user.id } as OutboundSocketMsg));
 				const leaveMsg = { author: '', id: nanoid(), rawContent: `${user.name} has left the chat` };
+				this.messages.push(leaveMsg);
 				socket.send(
 					JSON.stringify({
 						type: 'MESSAGE',
